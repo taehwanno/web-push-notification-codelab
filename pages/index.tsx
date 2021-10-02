@@ -28,6 +28,9 @@ const Home: NextPage = () => {
   const [subscription, setSubscription] = useState<PushSubscription | null>(
     null
   );
+  const [permissionStatus, setPermissionStatus] = useState<
+    "prompt" | "granted" | "denied"
+  >("prompt");
 
   useEffect(() => {
     (async () => {
@@ -36,10 +39,31 @@ const Home: NextPage = () => {
         setRegistration(registration);
         const subscription = await registration.pushManager.getSubscription();
         setSubscription(subscription);
+        const permission = await navigator.permissions.query({
+          name: "notifications",
+        });
+        setPermissionStatus(permission.state);
       } else {
         setPushSupported(false);
       }
     })();
+  }, []);
+
+  useEffect(() => {
+    let permission: PermissionStatus;
+    const handler = () => {
+      console.log(`Permission changed: ${permission.state}`);
+      setPermissionStatus(permission.state);
+    };
+
+    (async () => {
+      permission = await navigator.permissions.query({
+        name: "notifications",
+      });
+      permission.addEventListener("change", handler);
+    })();
+
+    () => permission.removeEventListener("change", handler);
   }, []);
 
   const handleButtonClick = () => {
@@ -73,11 +97,10 @@ const Home: NextPage = () => {
       if (subscription) {
         try {
           subscription.unsubscribe();
-        } catch (error) {
-          console.log("Error unsubscribing", error);
-        } finally {
           updateSubscriptionOnServer(null);
           console.log("User is unsubscribed.");
+        } catch (error) {
+          console.log("Error unsubscribing", error);
         }
       }
     }
@@ -116,45 +139,49 @@ const Home: NextPage = () => {
           padding: "5rem 0",
           flex: 1,
           display: "flex",
+          fontSize: "48px",
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
         })}
       >
         {isPushSupported ? (
-          <button
-            className={css({
-              border: 0,
-              background: "none",
-              lineHeight: 1.15,
-              fontSize: "64px",
-              fontWeight: "bold",
-              textAlign: "center",
-              cursor: "pointer",
-              "&:hover, &:focus, &:active": {
-                textDecoration: "underline",
-              },
-            })}
-            onClick={handleButtonClick}
-          >
-            {subscription ? "Unsubscribe" : "Subscribe"} to{" "}
-            <span
+          permissionStatus !== "denied" ? (
+            <button
               className={css({
-                color: "#0070f3",
+                border: 0,
+                background: "none",
+                fontSize: "inherit",
+                textAlign: "center",
+                cursor: "pointer",
+                "&:hover, &:focus, &:active": {
+                  textDecoration: "underline",
+                },
               })}
+              onClick={handleButtonClick}
             >
-              Push Notification!
-            </span>
-          </button>
+              {subscription ? "Unsubscribe" : "Subscribe"} to{" "}
+              <span
+                className={css({
+                  color: "#0070f3",
+                })}
+              >
+                Push Notification!
+              </span>
+            </button>
+          ) : (
+            "Permission denied 😥"
+          )
         ) : (
           "Push not supported 😥"
         )}
-        {subscription && (
+        {permissionStatus === "granted" && subscription && (
           <p
             className={css({
               maxWidth: "760px",
               padding: "8px",
               marginTop: "32px",
+              fontSize: "12px",
               textAlign: "center",
               wordBreak: "break-all",
             })}
