@@ -160,7 +160,10 @@ const Home: NextPage = () => {
               })}
               onClick={handleButtonClick}
             >
-              {subscription ? "Unsubscribe" : "Subscribe"} to{" "}
+              {subscription && permissionStatus !== "prompt"
+                ? "Unsubscribe"
+                : "Subscribe"}{" "}
+              to{" "}
               <span
                 className={css({
                   color: "#0070f3",
