@@ -1,12 +1,19 @@
 const cacheName = "webtech-pwa";
 const precachedResources = [
+  // index page
   "/",
   "/favicon.ico",
+
+  // blog page
+  "/blog",
   "/_next/static/chunks/webpack-fb76148cfcfb42ca18eb.js",
   "/_next/static/chunks/framework-895f067827ebe11ffe45.js",
   "/_next/static/chunks/main-c4f2541b93e4ae8b71f8.js",
-  "/_next/static/chunks/pages/_app-6d31306c26ba5d775c7a.js",
-  "/_next/static/chunks/pages/index-f2319ce09ae3306df5b3.js"
+  "/_next/static/chunks/pages/_app-036880592104677f92ab.js",
+  "/_next/static/chunks/pages/blog-f7dc72116cbfe00f3971.js",
+  "https://miro.medium.com/fit/c/140/140/1*M355w-f84DHrZ6L0wxPGeA.jpeg",
+  "https://miro.medium.com/fit/c/140/140/1*v9dNxym7pqhE3ifa3FPG3Q@2x.jpeg",
+  "https://miro.medium.com/fit/c/140/140/1*M3gpFGW2mq1rHmhxB8VlJA.jpeg",
 ];
 
 self.addEventListener("push", (event) => {
